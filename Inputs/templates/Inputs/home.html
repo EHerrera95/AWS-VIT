@@ -1,0 +1,36 @@
+{% extends 'Inputs/layout.html' %}
+
+{% block content %}
+<div class="home">
+    <h1>Visual Inspection Tool</h1>
+    <h2>[EHR Test-164b]</h2>
+    {% comment %} <h2><em>v1.2.2</em></h2> {% endcomment %}
+    <br>
+    {% if user.is_authenticated %}
+    <div class="instructions">
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Select the Test Data Version: <a href="{% url 'inputs' %}">2015 Edition</a> or <a href="{% url 'inputCures' %}">Cures Update</a></li>
+            <li>Select the specific Criteria from the drop-down list.</li>
+            <li>Upload C-CDA file to be visually inspected.</li>
+            <li>Click "Start Inspection" to see Results/Required Narrative Text.</li>
+            <br>
+            <em style="text-decoration:underline;">TIP: Double-click and CTRL+F over keywords to search table faster!</em>
+        </ol>
+    </div>
+    {% else %}
+        <div class="buttons">
+            <button>
+            <a href="{% url 'login' %}">Login</a>
+            </button>
+            {% comment %} <button class="btn">
+            <a href="{% url 'register' %}">Register</a>
+            </button> {% endcomment %}
+        </div>
+    {% endif%}
+</div>
+
+<br>
+
+
+{% endblock %}
