@@ -5,8 +5,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from .forms import InputForm, CuresInputForm, CreateUserForm
-from .models import AllLogin, InputModel, CuresInputModel, Validation
+from .forms import CuresInputForm, CreateUserForm, v3InputForm
+from .models import AllLogin, CuresInputModel, Validation, v3InputModel
 from django.core.files.storage import FileSystemStorage
 
 
@@ -28,7 +28,7 @@ def loginPage(request):
         if user is not None:
             login(request, user)
             AllLogin.objects.create(user = request.user)
-            return redirect('inputCures')
+            return redirect('inputsv1')
         else:
             messages.info(request, 'Username OR Password is incorrect')
 
@@ -56,21 +56,21 @@ def home(request):
     return render(request, 'Inputs/home.html')
 
 @login_required(login_url='home')
-def inputsCures(request):
+def inputsv1(request):
     if request.method == 'POST':
         CuresInputModel.objects.all().delete()
         form = CuresInputForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-        return redirect('resultsCures')
+        return redirect('resultsv1')
     else:
         form = CuresInputForm()
-    return render(request, "Inputs/inputs-cures.html", {
+    return render(request, "Inputs/inputs-v1.html", {
         'form':form,
     })
 
 @login_required(login_url='home')
-def resultsCures(request):
+def resultsv1(request):
     uploads = CuresInputModel.objects.all()
     crit = uploads[0].criteria
 
@@ -84,41 +84,75 @@ def resultsCures(request):
         filepath = f'.//media/{uploads[0].filename}'
         validation = Validation(crit,filepath)
     
-    return render(request, "Inputs/results-cures.html", {
+    return render(request, "Inputs/results-v1.html", {
         'uploads': uploads,
         'validation': validation,
     })
 
 @login_required(login_url='home')
-def inputs(request):
+def inputsv3(request):
     if request.method == 'POST':
-        InputModel.objects.all().delete()
-        form = InputForm(request.POST, request.FILES)
+        v3InputModel.objects.all().delete()
+        form = v3InputForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-        return redirect('results')
+        return redirect('resultsv3')
     else:
-        form = InputForm()
-    return render(request, "Inputs/inputs.html", {
+        form = v3InputForm()
+    return render(request, "Inputs/inputs-v3.html", {
         'form':form,
     })
 
 @login_required(login_url='home')
-def results(request):
-    uploads = InputModel.objects.all()
+def resultsv3(request):
+    uploads = v3InputModel.objects.all()
     crit = uploads[0].criteria
 
     path_string = uploads[0].filename
-    text = str(path_string)
+    text = str(path_string).lower()
     file_type = text[-4:]
     if file_type != '.xml':
         print('ERROR')
-        return redirect('inputs')    #Needs alert to import correct file
+        return redirect('inputsv3')    #Needs alert to import correct file
     else:
         filepath = f'.//media/{uploads[0].filename}'
         validation = Validation(crit,filepath)
     
-    return render(request, "Inputs/results.html", {
+    return render(request, "Inputs/results-v3.html", {
         'uploads': uploads,
         'validation': validation,
     })
+
+# @login_required(login_url='home')
+# def inputs(request):
+#     if request.method == 'POST':
+#         InputModel.objects.all().delete()
+#         form = InputForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#         return redirect('results')
+#     else:
+#         form = InputForm()
+#     return render(request, "Inputs/inputs.html", {
+#         'form':form,
+#     })
+
+# @login_required(login_url='home')
+# def results(request):
+#     uploads = InputModel.objects.all()
+#     crit = uploads[0].criteria
+
+#     path_string = uploads[0].filename
+#     text = str(path_string)
+#     file_type = text[-4:]
+#     if file_type != '.xml':
+#         print('ERROR')
+#         return redirect('inputs')    #Needs alert to import correct file
+#     else:
+#         filepath = f'.//media/{uploads[0].filename}'
+#         validation = Validation(crit,filepath)
+    
+#     return render(request, "Inputs/results.html", {
+#         'uploads': uploads,
+#         'validation': validation,
+#     })
